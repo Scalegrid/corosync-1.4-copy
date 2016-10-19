@@ -407,7 +407,18 @@ printf ("couldn't find totem handle\n");
 			res = totemip_parse (&totem_config->interfaces[ringnumber].bindnet, str,
 					     totem_config->interfaces[ringnumber].mcast_addr.family);
 		}
+		/*
+		 * getting the announce Ip for NAT support.
+		 */
 
+		unsigned char priv_now[] = "0.0.0.0";
+		totemip_parse(&totem_config->interfaces[ringnumber].announce_ip,priv_now,AF_INET);
+		totemip_parse(&totem_config->interfaces[ringnumber].current_bound_ip,priv_now,AF_INET);
+
+		if (!objdb_get_string (objdb, object_interface_handle, "announceip", &str)) {
+					res = totemip_parse (&totem_config->interfaces[ringnumber].announce_ip, str,
+							     totem_config->interfaces[ringnumber].mcast_addr.family);
+				}
 		/*
 		 * Get the TTL
 		 */

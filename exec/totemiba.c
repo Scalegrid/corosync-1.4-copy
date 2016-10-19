@@ -1266,10 +1266,18 @@ static void timer_function_netif_check_timeout (
 	int interface_up;
 	int interface_num;
 	int addr_len;
+	struct totem_ip_address zero_addr;
+	memset(&zero_addr, 0, sizeof(struct totem_ip_address));
+	unsigned char zero_now[] = "0.0.0.0";
+	totemip_parse(&zero_addr,zero_now,AF_INET);
 
 	totemip_iface_check (&instance->totem_interface->bindnet,
 		&instance->totem_interface->boundto, &interface_up, &interface_num, instance->totem_config->clear_node_high_bit);
-
+	totemip_copy(&instance->totem_interface->current_bound_ip,bound_to);
+	if(totemip_compare(&instance->totem_interface->announce_ip,&zero_addr)!=0){
+		instance->totem_interface->announce_ip.nodeid = instance->totem_interface->boundto->nodeid;
+		totemip_copy(&instance->totem_interface->boundto,&instance->totem_interface->announce_ip);
+	}
 	totemip_totemip_to_sockaddr_convert(&instance->totem_interface->boundto,
 		instance->totem_interface->ip_port, (struct sockaddr_storage *)&instance->bind_addr,
 		&addr_len);
